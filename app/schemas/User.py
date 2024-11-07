@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr
 class UserBase(BaseModel):
     name: str
     lastname: str
-    mail: EmailStr  # Validación de email
+    mail: EmailStr 
     user_type: str
     rol: str
     state: str
@@ -30,3 +30,6 @@ class UserResponse(UserBase):
 
 class TokenData(BaseModel):
     mail: str | None = None
+    name: str | None = None
+    lastname: str | None = None
+    rol: str | None = None

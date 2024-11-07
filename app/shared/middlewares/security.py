@@ -3,10 +3,10 @@ from typing import Optional
 import os
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from dotenv import load_dotenv
+load_dotenv()
 
-
-# Configuración
-SECRET_KEY = os.getenv("SECRET_KEY")  # Cambia esto en producción
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

@@ -1,12 +1,16 @@
 from fastapi import APIRouter, Depends, status, HTTPException, Security
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jose import JWTError
+import jwt
 from sqlalchemy.orm import Session
 from typing import List
 from datetime import datetime, timedelta
 from app.shared.config.db import get_db
 from app.models.User import User
-from app.schemas.User import UserCreate, UserResponse, Token, TokenData
+from app.schemas.User import UserCreate, UserResponse, Token
 from app.shared.middlewares.security import (
+    ALGORITHM,
+    SECRET_KEY,
     verify_password,
     get_password_hash,
     create_access_token,
@@ -86,5 +90,10 @@ async def get_current_user(
 async def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
 
-
-
+@userRoutes.get('/user/', response_model=List[UserResponse])
+async def get_users(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    all_users = db.query(User).all()
+    return all_users

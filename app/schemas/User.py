@@ -1,20 +1,32 @@
-from pydantic import BaseModel; 
+from datetime import datetime
+from pydantic import BaseModel, ConfigDict, EmailStr
 
-
+# Modelo base con los campos comunes
 class UserBase(BaseModel):
-    id: int
     name: str
+    lastname: str
+    mail: EmailStr  # Validación de email
+    user_type: str
+    rol: str
+    state: str
+    deleted: bool = False
 
-    class config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
-class userRequest(UserBase):
-    class config:
-        orm_mode = True
+# Modelo para crear usuarios (sin id_user y con password)
+class UserCreate(UserBase):
+    password: str
+    creation_date: datetime | None = None
+    
+    
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
-class userResponse(UserBase):
-    id: int
+# Modelo para respuestas (con id_user pero sin password)
+class UserResponse(UserBase):
+    id_user: int
+    creation_date: datetime
 
-
-    class config:
-        orm_mode = True
+class TokenData(BaseModel):
+    mail: str | None = None

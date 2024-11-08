@@ -8,12 +8,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routes.userRouter import userRoutes
 from app.routes.employeeRouter import employeeRoutes
 from app.routes.forum_router import forumRoutes
+from app.routes.post_router import postRoutes
+from app.routes.comment_router import commentRoutes
+from app.routes.sale_post_router import salePostRoutes
+from app.routes.chat_router import chatRoutes
+from app.routes.message_router import messageRoutes
 app = FastAPI()
 
 app.include_router(userRoutes)
-app.include_router(employeeRoutes)
+# app.include_router(employeeRoutes)
 app.include_router(forumRoutes)
-
+app.include_router(postRoutes)
+app.include_router(commentRoutes)
+app.include_router(salePostRoutes)
+app.include_router(chatRoutes)
+app.include_router(messageRoutes)
 origins = [
     "http://localhost",
     "http://localhost:8080",

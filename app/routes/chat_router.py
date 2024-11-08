@@ -1,0 +1,54 @@
+from datetime import datetime
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from typing import List
+from app.models.chat import Chat
+from app.schemas.chat_schema import ChatCreate, ChatResponse
+from app.shared.config.db import get_db
+from app.routes.userRouter import get_current_user
+
+chatRoutes = APIRouter()
+
+# Crear un nuevo chat
+@chatRoutes.post('/chat/', status_code=status.HTTP_201_CREATED, response_model=ChatResponse)
+async def create_chat(chat: ChatCreate, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+    db_chat = Chat(**chat.model_dump(exclude={'message_date'}), message_date=datetime.now(), user_id=current_user.id_user)
+    db.add(db_chat)
+    db.commit()
+    return db_chat
+
+# Obtener todos los chats
+@chatRoutes.get('/chat/', response_model=List[ChatResponse])
+async def get_all_chats(db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+    chats = db.query(Chat).filter(Chat.user_id == current_user.id_user).all()
+    return chats
+
+# Obtener un chat por ID
+@chatRoutes.get('/chat/{id_chat}', response_model=ChatResponse)
+async def get_chat_by_id(id_chat: int, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+    chat = db.query(Chat).filter(Chat.id_chat == id_chat, Chat.user_id == current_user.id_user).first()
+    if not chat:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Chat not found")
+    return chat
+
+# Actualizar un chat por ID
+@chatRoutes.put('/chat/{id_chat}', response_model=ChatResponse)
+async def update_chat(id_chat: int, chat: ChatCreate, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+    db_chat = db.query(Chat).filter(Chat.id_chat == id_chat, Chat.user_id == current_user.id_user).first()
+    if not db_chat:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Chat not found")
+    db_chat.update(**chat.model_dump(exclude={'message_date'}), message_date=datetime.now())
+    db.commit()
+    return db_chat
+
+# Eliminar un chat por ID
+@chatRoutes.delete('/chat/{id_chat}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_chat(id_chat: int, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+    db_chat = db.query(Chat).filter(Chat.id_chat == id_chat, Chat.user_id == current_user.id_user).first()
+    if not db_chat:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Chat not found")
+    db.delete(db_chat)
+    db.commit()
+    
+
+    

@@ -14,6 +14,6 @@ class Forum(Base):
     creation_date = Column(DateTime, nullable=False)
     state = Column(String(255), nullable=False)
     privacy = Column(Enum(GroupType), nullable=False)
-    id_user = Column(Integer, ForeignKey("user.id_user"), nullable=False)
+    id_user = Column(Integer, ForeignKey("user.id_user", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
     password = Column(String(255), nullable=True)
     

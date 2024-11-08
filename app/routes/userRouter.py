@@ -5,9 +5,12 @@ import jwt
 from sqlalchemy.orm import Session
 from typing import List
 from datetime import datetime, timedelta
+from app.models.Forum import Forum
 from app.shared.config.db import get_db
 from app.models.User import User
 from app.schemas.User import UserCreate, UserResponse, Token
+from app.models.user_forum import UserForum
+from app.schemas.user_forum_schema import UserForumCreate, UserForumResponse
 from app.shared.middlewares.security import (
     ALGORITHM,
     SECRET_KEY,
@@ -97,3 +100,27 @@ async def get_users(
 ):
     all_users = db.query(User).all()
     return all_users
+
+# Funcion para obtener usuario por id
+@userRoutes.get('/user/{user_id}', status_code=status.HTTP_200_OK, response_model=UserResponse)
+async def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id_user == user_id).first()
+    return user
+
+# Funcion para que el usuario se una a un foro
+@userRoutes.post('/user/join_forum/{forum_id}', status_code=status.HTTP_200_OK, response_model=UserForumResponse)
+async def join_forum(forum_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    forum = db.query(Forum).filter(Forum.id_forum == forum_id).first()
+    if not forum:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Foro no encontrado")
+    if db.query(UserForum).filter(UserForum.id_user == current_user.id_user, UserForum.id_forum == forum_id).first():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Usuario ya pertenece al foro")
+    user_forum = UserForum(
+        id_user=current_user.id_user,
+        id_forum=forum_id,
+        join_date=datetime.now()
+    )
+    db.add(user_forum)
+    db.commit()
+    db.refresh(user_forum)
+    return user_forum

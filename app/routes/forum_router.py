@@ -3,7 +3,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from app.models.Forum import Forum, GroupType
+from app.models.user_forum import UserForum
+from app.schemas.User import UserResponse
 from app.schemas.forum_schema import ForumCreate, ForumResponse
+from app.schemas.user_forum_schema import UserForumResponse
 from app.shared.config.db import get_db
 from app.routes.userRouter import get_current_user
 
@@ -72,3 +75,9 @@ async def delete_forum(forum_id: int, db: Session = Depends(get_db), current_use
     db.delete(db_forum)
     db.commit()
     return
+
+# Funcion para obtener todos los usuarios de un foro
+@forumRoutes.get('/forum/{forum_id}/users', status_code=status.HTTP_200_OK, response_model=List[UserForumResponse])
+async def get_users_by_forum(forum_id: int, db: Session = Depends(get_db)):
+    users = db.query(UserForum).filter(UserForum.id_forum == forum_id).all()
+    return users

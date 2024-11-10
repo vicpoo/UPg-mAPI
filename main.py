@@ -1,28 +1,32 @@
-from fastapi import FastAPI, Depends,status, HTTPException
-from sqlalchemy.orm import Session
-from typing import List
-from pymongo.mongo_client import MongoClient
-from app.shared.config.mongoConnection import client
-from app.shared.config.db import engine, get_db, Base
+import asyncio
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes.userRouter import userRoutes
-from app.routes.employeeRouter import employeeRoutes
-from app.routes.forum_router import forumRoutes
-from app.routes.post_router import postRoutes
-from app.routes.comment_router import commentRoutes
-from app.routes.sale_post_router import salePostRoutes
-from app.routes.chat_router import chatRoutes
-from app.routes.message_router import messageRoutes
+from app.shared.config.db import engine, Base
+
+# Importar las rutas creadas
+from app.routes.user_routes import userRoutes
+from app.routes.post_routes import postRoutes
+from app.routes.comment_routes import commentRoutes
+from app.routes.news_routes import newsRoutes
+from app.routes.question_routes import questionRoutes
+from app.routes.like_routes import likeRoutes
+from app.routes.muscle_group_routes import muscleGroupRoutes
+from app.routes.exercise_routes import exerciseRoutes
+
+# Inicializar la aplicación FastAPI
 app = FastAPI()
 
+# Incluir las rutas creadas
 app.include_router(userRoutes)
-# app.include_router(employeeRoutes)
-app.include_router(forumRoutes)
 app.include_router(postRoutes)
 app.include_router(commentRoutes)
-app.include_router(salePostRoutes)
-app.include_router(chatRoutes)
-app.include_router(messageRoutes)
+app.include_router(newsRoutes)
+app.include_router(questionRoutes)
+app.include_router(likeRoutes)
+app.include_router(muscleGroupRoutes)
+app.include_router(exerciseRoutes)
+
+# Configuración de CORS
 origins = [
     "http://localhost",
     "http://localhost:8080",
@@ -37,5 +41,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-Base.metadata.create_all(bind=engine)
+# Función asíncrona para crear todas las tablas en la base de datos
+async def create_tables():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
+# Ejecutar la creación de tablas cuando se inicia la aplicación
+@app.on_event("startup")
+async def startup():
+    await create_tables()
+
+# Ruta raíz para verificar el estado de la API
+@app.get("/")
+def read_root():
+    return {"message": "Bienvenido a la API de UPgym"}

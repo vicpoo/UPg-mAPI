@@ -1,15 +1,13 @@
-from sqlalchemy import Column, DateTime, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, LargeBinary, Text
 from app.shared.config.db import Base
 
 class User(Base):
-    __tablename__ = "user"
-    id_user = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    name = Column(String(255), nullable=False)
-    lastname = Column(String(255), nullable=False)
-    mail = Column(String(255), nullable=False)
-    password = Column(String(255), nullable=False)
-    user_type = Column(String(255), nullable=False)
-    rol = Column(String(255), nullable=False)
-    creation_date = Column(DateTime, nullable=False)
-    state = Column(String(255), nullable=False)
-    deleted = Column(Boolean, nullable=False, default=False)
+    __tablename__ = "usuario"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nombre_usuario = Column(String, unique=True, nullable=False)
+    correo = Column(String, unique=True, nullable=False)
+    contraseña = Column(String, nullable=False)
+    foto_perfil = Column(LargeBinary, nullable=True)
+    descripcion = Column(Text, nullable=True)
+    es_premium = Column(Boolean, default=False)

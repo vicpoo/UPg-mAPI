@@ -1,20 +1,29 @@
-from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import os
+from dotenv import load_dotenv
 
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:1234@localhost/educalink"
-#SQLALCHEMY_DATABASE_URL = "postgresql://postgres:postgres@database-1.cpo8mtxvyoqv.us-east-1.rds.amazonaws.com/educalink"
+# Cargar variables de entorno desde .env
+load_dotenv()
 
+# Obtener la URL de la base de datos desde las variables de entorno
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:1234@localhost/upgym")
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+# Crear el motor de la base de datos asíncrona
+engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True)
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# Crear una sesión asíncrona
+SessionLocal = sessionmaker(
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False
+)
+
+# Declarar la base para los modelos
 Base = declarative_base()
 
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+# Dependencia para obtener la sesión de la base de datos
+async def get_db():
+    async with SessionLocal() as session:
+        yield session

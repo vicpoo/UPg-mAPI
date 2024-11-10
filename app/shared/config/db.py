@@ -8,7 +8,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Obtener la URL de la base de datos desde las variables de entorno
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:1234@localhost/upgym")
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:1234@localhost:5433/upgym")
+
+
+
 
 # Crear el motor de la base de datos asíncrona
 engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True)

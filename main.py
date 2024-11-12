@@ -53,5 +53,5 @@ async def startup():
 
 # Ruta raíz para verificar el estado de la API
 @app.get("/")
-def read_root():
+async def read_root():
     return {"message": "Bienvenido a la API de UPgym"}

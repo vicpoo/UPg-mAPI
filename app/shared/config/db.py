@@ -1,17 +1,9 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import os
-from dotenv import load_dotenv
 
-# Cargar variables de entorno desde .env
-load_dotenv()
-
-# Obtener la URL de la base de datos desde las variables de entorno
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:1234@localhost:5433/upgym")
-
-
-
+# URL de conexión a la base de datos usando asyncpg para conexiones asíncronas
+SQLALCHEMY_DATABASE_URL = "postgresql+asyncpg://postgres:1234@localhost:5432/UPgym"
 
 # Crear el motor de la base de datos asíncrona
 engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True)

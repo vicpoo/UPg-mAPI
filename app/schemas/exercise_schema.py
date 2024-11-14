@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from enum import Enum
+from typing import Optional
 
 class Nivel(str, Enum):
     BASICO = "BASICO"
@@ -12,16 +13,16 @@ class UbicacionEjercicio(str, Enum):
 
 class ExerciseBase(BaseModel):
     titulo: str
-    resumen: str | None = None
+    resumen: Optional[str] = None
     nivel: Nivel
-    tiempo_descanso: int | None = None
-    repeticiones: int | None = None
-    imagen: bytes | None = None
+    tiempo_descanso: Optional[int] = None
+    repeticiones: Optional[int] = None
+    imagen: Optional[bytes] = None
     ubicacion: UbicacionEjercicio
 
 class ExerciseCreate(ExerciseBase):
-    pass
+    grupo_muscular_id: Optional[int] = None
 
 class ExerciseResponse(ExerciseBase):
     id: int
-    grupo_muscular_id: int
+    grupo_muscular_id: Optional[int] = None

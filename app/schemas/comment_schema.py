@@ -4,7 +4,8 @@ class CommentBase(BaseModel):
     contenido: str
 
 class CommentCreate(CommentBase):
-    pass
+    publicacion_id: int
+    usuario_id: int
 
 class CommentResponse(CommentBase):
     id: int

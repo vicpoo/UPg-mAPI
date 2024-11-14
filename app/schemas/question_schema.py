@@ -4,7 +4,7 @@ class QuestionBase(BaseModel):
     contenido: str
 
 class QuestionCreate(QuestionBase):
-    pass
+    usuario_id: int  # Agregamos usuario_id aquí para recibirlo en la creación de preguntas
 
 class QuestionResponse(QuestionBase):
     id: int

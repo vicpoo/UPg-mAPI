@@ -29,16 +29,16 @@ app.include_router(exerciseRoutes)
 # Configuración de CORS
 origins = [
     "http://localhost",
-    "http://localhost:8080",
+    "http://localhost:4200",
     "http://127.0.0.1:8000"
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=origins,  # Orígenes permitidos
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Permitir todos los métodos HTTP (GET, POST, etc.)
+    allow_headers=["*"],  # Permitir todos los encabezados
 )
 
 # Función asíncrona para crear todas las tablas en la base de datos

@@ -1,6 +1,6 @@
+from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile
 from typing import List
 from datetime import timedelta, datetime
-from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.models.user import User
@@ -105,14 +105,23 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
 
 # Endpoint to update a user by ID (authentication required)
 @userRoutes.put('/user/{user_id}', response_model=UserResponse)
-async def update_user(user_id: int, user: UserCreate, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
+async def update_user(
+    user_id: int,
+    user: UserCreate = Depends(),
+    foto_perfil: UploadFile = File(None),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     result = await db.execute(select(User).where(User.id == user_id))
     db_user = result.scalar_one_or_none()
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     for key, value in user.dict(exclude_unset=True).items():
         setattr(db_user, key, value if key != "contraseña" else get_password_hash(value))
+    
+    if foto_perfil:
+        db_user.foto_perfil = await foto_perfil.read()  # Guarda la foto como bytes
     
     await db.commit()
     await db.refresh(db_user)

@@ -13,14 +13,11 @@ import base64
 
 userRoutes = APIRouter()
 
-# JWT configuration and security settings
 SECRET_KEY = "3b29f8d55cb94482a2e459cb5d7e9b3e68de5463bce117ef7c8d3c1c2b6b12a8"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-# Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 def verify_password(plain_password, hashed_password):
@@ -48,14 +45,13 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    
+
     result = await db.execute(select(User).where(User.correo == email))
     user = result.scalar_one_or_none()
     if user is None:
         raise credentials_exception
     return user
 
-# Create a new user
 @userRoutes.post('/user/', response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     existing_user = await db.execute(select(User).where(User.correo == user.correo))
@@ -77,14 +73,12 @@ async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     await db.refresh(new_user)
     return new_user
 
-# Get the current user's profile
 @userRoutes.get('/user/me', response_model=UserResponse)
 async def get_user_profile(current_user: User = Depends(get_current_user)):
     if current_user.foto_perfil:
         current_user.foto_perfil = base64.b64encode(current_user.foto_perfil).decode('utf-8')
     return current_user
 
-# Update a user
 @userRoutes.put('/user/{user_id}', response_model=UserResponse)
 async def update_user(
     user_id: int,
@@ -99,6 +93,7 @@ async def update_user(
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
+    # Update fields
     db_user.nombre_usuario = nombre_usuario
     db_user.descripcion = descripcion
     if foto_perfil:
@@ -106,7 +101,13 @@ async def update_user(
 
     await db.commit()
     await db.refresh(db_user)
+
+    # Convert photo to Base64 if it exists
+    if db_user.foto_perfil:
+        db_user.foto_perfil = base64.b64encode(db_user.foto_perfil).decode('utf-8')
+
     return db_user
+
 
 @userRoutes.post("/login", response_model=Token)
 async def login(user: UserLogin, db: AsyncSession = Depends(get_db)):

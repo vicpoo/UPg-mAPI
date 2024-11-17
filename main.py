@@ -35,11 +35,12 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # Orígenes permitidos
+    allow_origins=["*"],  # Permitir todos los orígenes temporalmente para pruebas
     allow_credentials=True,
-    allow_methods=["*"],  # Permitir todos los métodos HTTP (GET, POST, etc.)
-    allow_headers=["*"],  # Permitir todos los encabezados
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
 
 # Función asíncrona para crear todas las tablas en la base de datos
 async def create_tables():

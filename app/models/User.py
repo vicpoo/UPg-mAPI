@@ -15,3 +15,4 @@ class User(Base):
 
     # Relación con el modelo Post
     posts = relationship("Post", back_populates="usuario")
+    comentarios = relationship("Comment", back_populates="usuario")

@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, Text, ForeignKey
+from sqlalchemy.orm import relationship
 from app.shared.config.db import Base
 
 class Comment(Base):
@@ -8,3 +9,8 @@ class Comment(Base):
     contenido = Column(Text, nullable=False)
     publicacion_id = Column(Integer, ForeignKey("publicacion.id"))
     usuario_id = Column(Integer, ForeignKey("usuario.id"))
+
+
+
+    # Relación con el modelo User
+    usuario = relationship("User", back_populates="comentarios")

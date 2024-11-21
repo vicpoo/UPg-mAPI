@@ -73,11 +73,17 @@ async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     await db.refresh(new_user)
     return new_user
 
+from fastapi.responses import JSONResponse
+import base64
+
 @userRoutes.get('/user/me', response_model=UserResponse)
 async def get_user_profile(current_user: User = Depends(get_current_user)):
     if current_user.foto_perfil:
+        # Convertir la foto binaria a Base64
         current_user.foto_perfil = base64.b64encode(current_user.foto_perfil).decode('utf-8')
     return current_user
+
+
 
 @userRoutes.put('/user/{user_id}', response_model=UserResponse)
 async def update_user(

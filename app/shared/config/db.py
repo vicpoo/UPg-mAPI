@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 # URL de conexión a la base de datos usando asyncpg para conexiones asíncronas
-SQLALCHEMY_DATABASE_URL = "postgresql+asyncpg://postgres:1234@localhost:5432/UPgym"
+SQLALCHEMY_DATABASE_URL = "postgresql+asyncpg://postgres:RutaAWS19@databasegym.cbvo0epojgpy.us-east-1.rds.amazonaws.com/databaseGYM"
 
 # Crear el motor de la base de datos asíncrono
 engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True)

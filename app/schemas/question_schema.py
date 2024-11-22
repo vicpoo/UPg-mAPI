@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 class QuestionBase(BaseModel):
     contenido: str
@@ -9,3 +10,7 @@ class QuestionCreate(QuestionBase):
 class QuestionResponse(QuestionBase):
     id: int
     usuario_id: int
+    fecha_creacion: datetime  # Incluir fecha en la respuesta
+
+    class Config:
+        orm_mode = True  # Permite a Pydantic mapear datos desde SQLAlchemy

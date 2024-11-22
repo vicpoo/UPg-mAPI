@@ -2,6 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy import desc
 from app.models.post import Post
 from app.models.user import User
 from app.schemas.post_schema import PostResponse
@@ -9,8 +10,7 @@ from app.shared.config.db import get_db
 import base64
 import io
 from PIL import Image
-
-
+from datetime import datetime
 
 postRoutes = APIRouter()
 
@@ -42,7 +42,8 @@ async def create_post(
     new_post = Post(
         descripcion=descripcion,
         usuario_id=usuario_id,
-        imagen=imagen_data
+        imagen=imagen_data,
+        fecha_creacion=datetime.utcnow()  # Asigna la fecha actual al momento de creación
     )
     db.add(new_post)
     await db.commit()
@@ -53,11 +54,10 @@ async def create_post(
 
     return new_post
 
-
 @postRoutes.get('/posts/', response_model=List[PostResponse])
 async def get_posts(db: AsyncSession = Depends(get_db)):
-    """Recuperar todas las publicaciones."""
-    result = await db.execute(select(Post))
+    """Recuperar todas las publicaciones, ordenadas por fecha de creación (más recientes primero)."""
+    result = await db.execute(select(Post).order_by(desc(Post.fecha_creacion)))
     posts = result.scalars().all()
 
     for post in posts:
@@ -68,8 +68,10 @@ async def get_posts(db: AsyncSession = Depends(get_db)):
 
 @postRoutes.get('/posts/user/{usuario_id}', response_model=List[PostResponse])
 async def get_user_posts(usuario_id: int, db: AsyncSession = Depends(get_db)):
-    """Obtiene las publicaciones realizadas por un usuario específico."""
-    result = await db.execute(select(Post).where(Post.usuario_id == usuario_id))
+    """Obtiene las publicaciones realizadas por un usuario específico, ordenadas por fecha."""
+    result = await db.execute(
+        select(Post).where(Post.usuario_id == usuario_id).order_by(desc(Post.fecha_creacion))
+    )
     posts = result.scalars().all()
 
     for post in posts:
@@ -77,7 +79,6 @@ async def get_user_posts(usuario_id: int, db: AsyncSession = Depends(get_db)):
             post.imagen = f"data:image/jpeg;base64,{base64.b64encode(post.imagen).decode('utf-8')}"
 
     return posts
-
 
 @postRoutes.get('/post/{post_id}', response_model=PostResponse)
 async def get_post_by_id(post_id: int, db: AsyncSession = Depends(get_db)):

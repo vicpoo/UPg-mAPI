@@ -14,8 +14,8 @@ class CommentResponse(BaseModel):
     id: int
     contenido: str
     publicacion_id: int
-    usuario_nombre: Optional[str]  # Nombre del usuario que hizo el comentario
-    usuario_foto: Optional[str]  # Foto de perfil en Base64 del usuario que hizo el comentario
+    usuario_nombre: Optional[str] = None
+    usuario_foto: Optional[str] = None
 
     class Config:
         orm_mode = True
@@ -26,4 +26,5 @@ class CommentResponse(BaseModel):
         if image_data:
             return base64.b64encode(image_data).decode('utf-8')
         return None
+
 

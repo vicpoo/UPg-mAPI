@@ -9,14 +9,34 @@ from app.shared.config.db import get_db
 
 commentRoutes = APIRouter()
 
+from sqlalchemy.orm import joinedload
+from app.models.user import User
+
 @commentRoutes.post('/comment/', response_model=CommentResponse, status_code=status.HTTP_201_CREATED)
 async def create_comment(comment: CommentCreate, db: AsyncSession = Depends(get_db)):
-    """Create a new comment."""
     db_comment = Comment(**comment.dict())
     db.add(db_comment)
     await db.commit()
     await db.refresh(db_comment)
-    return db_comment
+
+    # Cargar el usuario relacionado
+    result = await db.execute(
+        select(Comment)
+        .filter(Comment.id == db_comment.id)
+        .options(joinedload(Comment.usuario))
+    )
+    db_comment = result.scalars().first()
+
+    # Crear la respuesta manualmente
+    return CommentResponse(
+        id=db_comment.id,
+        contenido=db_comment.contenido,
+        publicacion_id=db_comment.publicacion_id,
+        usuario_nombre=db_comment.usuario.nombre_usuario,
+        usuario_foto=CommentResponse.encode_image(db_comment.usuario.foto_perfil),
+    )
+
+
 
 from sqlalchemy.orm import joinedload
 from app.models.comment import Comment

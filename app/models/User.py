@@ -13,6 +13,8 @@ class User(Base):
     descripcion = Column(Text, nullable=True)
     es_premium = Column(Boolean, default=False)
 
-    # Relación con el modelo Post
+    # Relación con el modelo Respuesta
+    respuestas = relationship("Respuesta", back_populates="usuario")
+    # Relación con otros modelos
     posts = relationship("Post", back_populates="usuario")
     comentarios = relationship("Comment", back_populates="usuario")

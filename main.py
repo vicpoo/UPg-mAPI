@@ -12,6 +12,7 @@ from app.routes.question_routes import questionRoutes
 from app.routes.like_routes import likeRoutes
 from app.routes.muscle_group_routes import muscleGroupRoutes
 from app.routes.exercise_routes import exerciseRoutes
+from app.routes.respuesta_routes import respuestaRoutes
 
 # Inicializar la aplicación FastAPI
 app = FastAPI()
@@ -25,6 +26,7 @@ app.include_router(questionRoutes)
 app.include_router(likeRoutes)
 app.include_router(muscleGroupRoutes)
 app.include_router(exerciseRoutes)
+app.include_router(respuestaRoutes)
 
 # Configuración de CORS
 origins = [
@@ -35,10 +37,10 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"],  # Asegúrate de incluir tu origen
+    allow_origins=origins,  # Orígenes permitidos
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],    # Métodos permitidos
+    allow_headers=["*"],    # Encabezados permitidos
 )
 
 

@@ -22,6 +22,9 @@ class UserUpdate(BaseModel):
 class UserResponse(UserBase):
     id: int
     foto_perfil: Optional[str] = None
+    nombre_usuario: str
+    correo: str
+    descripcion: Optional[str] = None
 
     class Config:
         from_attributes = True

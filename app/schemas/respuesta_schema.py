@@ -16,5 +16,6 @@ class RespuestaOut(BaseModel):
     usuario_nombre: str
     usuario_foto: Optional[str]
 
+
     class Config:
         orm_mode = True

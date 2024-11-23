@@ -51,11 +51,12 @@ async def crear_respuesta(respuesta: RespuestaCreate, db: AsyncSession = Depends
     }
 
 
-@respuestaRoutes.get("/preguntas/{question_id}/respuestas/", response_model=list[RespuestaOut], status_code=status.HTTP_200_OK)
-async def obtener_respuestas(pregunta_id: int, db: AsyncSession = Depends(get_db)):
+@respuestaRoutes.get("/preguntas/{question_id}/respuestas/", response_model=list[RespuestaOut])
+async def obtener_respuestas(question_id: int, db: AsyncSession = Depends(get_db)):
+
     # Obtén las respuestas relacionadas con la pregunta
     query = await db.execute(
-        select(Respuesta).where(Respuesta.pregunta_id == pregunta_id)
+        select(Respuesta).where(Respuesta.pregunta_id == question_id)
     )
     respuestas = query.scalars().all()
 

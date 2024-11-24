@@ -9,7 +9,7 @@ class User(Base):
     nombre_usuario = Column(String(50), unique=True, nullable=False)
     correo = Column(String(100), unique=True, nullable=False)
     contraseña = Column(String(100), nullable=False)
-    foto_perfil = Column(LargeBinary, nullable=True)
+    foto_perfil = Column(LargeBinary, nullable=True)  # Almacena binarios
     descripcion = Column(Text, nullable=True)
     es_premium = Column(Boolean, default=False)
 

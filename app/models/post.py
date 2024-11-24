@@ -13,4 +13,4 @@ class Post(Base):
     fecha_creacion = Column(DateTime, default=datetime.utcnow)  # Nueva columna
 
     # Relación con el modelo User
-    usuario = relationship("User", back_populates="posts", lazy="joined")
+    usuario = relationship("User", back_populates="posts")

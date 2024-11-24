@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.User import User
+from app.models.user import User
 from app.models.question import Question
 from app.models.respuesta import Respuesta
 from app.schemas.respuesta_schema import RespuestaOut, RespuestaCreate

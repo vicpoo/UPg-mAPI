@@ -3,14 +3,13 @@ from typing import List
 from datetime import timedelta, datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.models.user import User
 from app.schemas.user_schema import UserCreate, UserResponse, Token, UserLogin
 from app.shared.config.db import get_db
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 import base64
-
+from app.models.User import User
 userRoutes = APIRouter()
 
 SECRET_KEY = "3b29f8d55cb94482a2e459cb5d7e9b3e68de5463bce117ef7c8d3c1c2b6b12a8"

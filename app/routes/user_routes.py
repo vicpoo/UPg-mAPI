@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile, Form
+from fastapi import APIRouter, Query, Depends, HTTPException, status, File, UploadFile, Form
 from typing import List
 from datetime import timedelta, datetime
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,7 +14,7 @@ userRoutes = APIRouter()
 
 SECRET_KEY = "3b29f8d55cb94482a2e459cb5d7e9b3e68de5463bce117ef7c8d3c1c2b6b12a8"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 120
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
@@ -125,3 +125,26 @@ async def login(user: UserLogin, db: AsyncSession = Depends(get_db)):
         )
     access_token = create_access_token(data={"sub": db_user.correo})
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+
+
+@userRoutes.get("/search", response_model=List[UserResponse])
+async def search_users(
+    query: str = Query(..., min_length=1, description="Texto a buscar en el nombre de usuario"),
+    limit: int = Query(5, ge=1, le=50, description="Número máximo de resultados a devolver"),
+    db: AsyncSession = Depends(get_db)
+):
+    results = await db.execute(
+        select(User)
+        .where(User.nombre_usuario.ilike(f"{query}%"))
+        .limit(limit)
+    )
+    users = results.scalars().all()
+
+    # Convertir fotos a Base64 si existen
+    for user in users:
+        if user.foto_perfil:
+            user.foto_perfil = base64.b64encode(user.foto_perfil).decode('utf-8')
+
+    return users

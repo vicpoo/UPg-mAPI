@@ -15,6 +15,8 @@ class User(Base):
 
     # Relación con el modelo Respuesta
     respuestas = relationship("Respuesta", back_populates="usuario")
+    questions = relationship("Question", back_populates="usuario")
     # Relación con otros modelos
     posts = relationship("Post", back_populates="usuario")
     comentarios = relationship("Comment", back_populates="usuario")
+    porcentajes_grasa = relationship("PorcentajeGrasa", back_populates="usuario", lazy='select')

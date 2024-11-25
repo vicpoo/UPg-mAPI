@@ -13,9 +13,9 @@ class RespuestaOut(BaseModel):
     contenido: str
     pregunta_id: int
     fecha_creacion: datetime
-    usuario_nombre: str
+    usuario_nombre: Optional[str]
     usuario_foto: Optional[str]
-
 
     class Config:
         orm_mode = True
+

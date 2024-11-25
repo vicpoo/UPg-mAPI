@@ -10,7 +10,7 @@ from app.shared.config.db import get_db
 commentRoutes = APIRouter()
 
 from sqlalchemy.orm import joinedload
-from app.models.User import User
+from app.models.user import User
 
 @commentRoutes.post('/comment/', response_model=CommentResponse, status_code=status.HTTP_201_CREATED)
 async def create_comment(comment: CommentCreate, db: AsyncSession = Depends(get_db)):
@@ -40,7 +40,7 @@ async def create_comment(comment: CommentCreate, db: AsyncSession = Depends(get_
 
 from sqlalchemy.orm import joinedload
 from app.models.comment import Comment
-from app.models.User import User # Importamos el modelo User
+from app.models.user import User # Importamos el modelo User
 from app.schemas.comment_schema import CommentResponse
 
 @commentRoutes.get('/comments/{post_id}', response_model=List[CommentResponse])

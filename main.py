@@ -14,6 +14,7 @@ from app.routes.muscle_group_routes import muscleGroupRoutes
 from app.routes.exercise_routes import exerciseRoutes
 from app.routes.respuesta_routes import respuestaRoutes
 from app.routes.admin_routes import adminRoutes
+from app.routes.PorcentajeGrasa_routes import porcentajeGrasaRoutes
 
 
 # Inicializar la aplicación FastAPI
@@ -30,6 +31,7 @@ app.include_router(muscleGroupRoutes)
 app.include_router(exerciseRoutes)
 app.include_router(respuestaRoutes)
 app.include_router(adminRoutes)
+app.include_router(porcentajeGrasaRoutes)
 
 # Configuración de CORS
 origins = [

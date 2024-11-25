@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, Text, ForeignKey, DateTime
 from sqlalchemy.sql import func
 from app.shared.config.db import Base
+from app.models.user import User # Asegúrate de importar el modelo de usuario
 from sqlalchemy.orm import relationship
 
 
@@ -14,3 +15,4 @@ class Question(Base):
 
     # Relationship with other models, such as answers (Respuesta)
     respuestas = relationship("Respuesta", back_populates="pregunta")  # Reference to the Respuesta model
+    usuario = relationship("User", back_populates="questions")  # Relación con el modelo User

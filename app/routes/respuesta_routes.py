@@ -11,10 +11,13 @@ import base64
 respuestaRoutes = APIRouter()
 
 # Helper para convertir imágenes a Base64
-def encode_image(image: bytes) -> str:
-    return base64.b64encode(image).decode('utf-8') if image else ""  # Devuelve una cadena vacía si no hay imagen
-
-
+def encode_image(image_data: bytes | str) -> str:
+    """Convierte los datos de la imagen en formato base64."""
+    if isinstance(image_data, str):
+        return f"data:image/jpeg;base64,{image_data}"
+    elif isinstance(image_data, bytes):
+        return f"data:image/jpeg;base64,{base64.b64encode(image_data).decode('utf-8')}"
+    return None
 
 @respuestaRoutes.post("/respuestas/", response_model=RespuestaOut, status_code=status.HTTP_201_CREATED)
 async def crear_respuesta(respuesta: RespuestaCreate, db: AsyncSession = Depends(get_db)):
@@ -34,48 +37,64 @@ async def crear_respuesta(respuesta: RespuestaCreate, db: AsyncSession = Depends
     nueva_respuesta = Respuesta(
         contenido=respuesta.contenido,
         pregunta_id=respuesta.pregunta_id,
-        usuario_id=respuesta.usuario_id,
+        usuario_id=respuesta.usuario_id,  # Asocia la respuesta al usuario proporcionado
     )
     db.add(nueva_respuesta)
     await db.commit()
     await db.refresh(nueva_respuesta)
 
-    # Devuelve la respuesta creada, con información adicional del usuario
+    # Adjuntar datos del usuario para la respuesta
+    usuario_data = {
+        "id": usuario.id,
+        "nombre_usuario": usuario.nombre_usuario,
+        "correo": usuario.correo,
+        "descripcion": usuario.descripcion,
+        "foto_perfil": encode_image(usuario.foto_perfil) if usuario.foto_perfil else None
+    }
+
+    # Devuelve la respuesta creada con información del usuario
     return {
         "id": nueva_respuesta.id,
         "contenido": nueva_respuesta.contenido,
         "pregunta_id": nueva_respuesta.pregunta_id,
         "fecha_creacion": nueva_respuesta.fecha_creacion,
-        "usuario_nombre": usuario.nombre_usuario,
-        "usuario_foto": encode_image(usuario.foto_perfil),  # Maneja imágenes vacías correctamente
+        "usuario": usuario_data,  # Objeto usuario
     }
 
 
+
+from sqlalchemy.orm import selectinload
+
 @respuestaRoutes.get("/preguntas/{question_id}/respuestas/", response_model=list[RespuestaOut])
 async def obtener_respuestas(question_id: int, db: AsyncSession = Depends(get_db)):
-
-    # Obtén las respuestas relacionadas con la pregunta
+    # Obtén las respuestas relacionadas con la pregunta y carga los usuarios asociados
     query = await db.execute(
-        select(Respuesta).where(Respuesta.pregunta_id == question_id)
+        select(Respuesta)
+        .options(selectinload(Respuesta.usuario))  # Cargar la relación usuario
+        .where(Respuesta.pregunta_id == question_id)
     )
     respuestas = query.scalars().all()
-
-    # Consulta usuarios relacionados en una sola operación
-    usuario_ids = {respuesta.usuario_id for respuesta in respuestas}
-    usuarios_query = await db.execute(select(User).where(User.id.in_(usuario_ids)))
-    usuarios = {user.id: user for user in usuarios_query.scalars().all()}
 
     # Construye la respuesta enriquecida
     resultado = []
     for respuesta in respuestas:
-        usuario = usuarios.get(respuesta.usuario_id)
+        usuario = respuesta.usuario
+        if usuario and usuario.foto_perfil:
+            usuario.foto_perfil = encode_image(usuario.foto_perfil)  # Convertir la foto de perfil a base64
+        
+        # Construimos la respuesta incluyendo el objeto `usuario`
         resultado.append({
             "id": respuesta.id,
             "contenido": respuesta.contenido,
             "pregunta_id": respuesta.pregunta_id,
             "fecha_creacion": respuesta.fecha_creacion,
-            "usuario_nombre": usuario.nombre_usuario if usuario else None,
-            "usuario_foto": encode_image(usuario.foto_perfil) if usuario and usuario.foto_perfil else None,
+            "usuario": {
+                "id": usuario.id,
+                "nombre_usuario": usuario.nombre_usuario,
+                "correo": usuario.correo,
+                "descripcion": usuario.descripcion,
+                "foto_perfil": usuario.foto_perfil if usuario else None  # Foto convertida a base64
+            }
         })
 
     return resultado

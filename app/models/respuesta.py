@@ -9,7 +9,7 @@ class Respuesta(Base):
     id = Column(Integer, primary_key=True, index=True)
     contenido = Column(Text, nullable=False)
     pregunta_id = Column(Integer, ForeignKey("pregunta.id", ondelete="CASCADE"), nullable=False)
-    usuario_id = Column(Integer, ForeignKey("usuario.id", ondelete="CASCADE"), nullable=False)
+    usuario_id = Column(Integer, ForeignKey("usuario.id"))
     fecha_creacion = Column(DateTime, default=datetime.utcnow)
 
     usuario = relationship("User", back_populates="respuestas")

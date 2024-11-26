@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 from app.models.question import Question
-from app.models.User import User
+from app.models.user import User
 from app.schemas.question_schema import QuestionCreate, QuestionResponse
 from app.shared.config.db import get_db
 from sqlalchemy.orm import selectinload  # Para cargar relaciones
@@ -153,9 +153,12 @@ async def delete_question_no_middleware(question_id: int, db: AsyncSession = Dep
     """
     result = await db.execute(select(Question).filter(Question.id == question_id))
     db_question = result.scalar_one_or_none()
+
     if not db_question:
         raise HTTPException(status_code=404, detail="Question not found")
 
+    # Esto eliminará la pregunta y sus respuestas asociadas en cascada
     await db.delete(db_question)
     await db.commit()
+
     return {"message": "Question deleted"}

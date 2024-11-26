@@ -14,3 +14,11 @@ class Post(Base):
 
     # Relación con el modelo User
     usuario = relationship("User", back_populates="posts")
+
+
+  # Relación con los comentarios
+    comentarios = relationship(
+        "Comment",
+        back_populates="publicacion",
+        cascade="all, delete",  # Cascada en SQLAlchemy
+    )

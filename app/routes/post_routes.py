@@ -5,7 +5,7 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 from sqlalchemy import desc
 from app.models.post import Post
-from app.models.user import User
+from app.models.User import User
 from app.schemas.post_schema import PostResponse
 from app.shared.config.db import get_db
 import base64
@@ -171,6 +171,47 @@ async def delete_post(post_id: int, db: AsyncSession = Depends(get_db)):
     db_post = result.scalar_one_or_none()
     if db_post is None:
         raise HTTPException(status_code=404, detail="Post not found")
+    await db.delete(db_post)
+    await db.commit()
+    return {"message": "Post deleted"}
+
+@postRoutes.get('/admin/posts/', response_model=List[PostResponse])
+async def get_all_posts_no_middleware(db: AsyncSession = Depends(get_db)):
+    """
+    Recuperar todas las publicaciones sin usar middleware.
+    Este endpoint está diseñado para vistas administrativas.
+    """
+    result = await db.execute(
+        select(Post)
+        .options(joinedload(Post.usuario))  # Carga los datos del usuario relacionado
+        .order_by(desc(Post.fecha_creacion))
+    )
+    posts = result.scalars().all()
+
+    # Procesar imágenes en Base64
+    for post in posts:
+        if post.imagen:
+            post.imagen = f"data:image/jpeg;base64,{base64.b64encode(post.imagen).decode('utf-8')}"
+        if post.usuario and post.usuario.foto_perfil:
+            if isinstance(post.usuario.foto_perfil, bytes):
+                post.usuario.foto_perfil = f"data:image/jpeg;base64,{base64.b64encode(post.usuario.foto_perfil).decode('utf-8')}"
+            else:
+                post.usuario.foto_perfil = None
+
+    return posts
+
+
+@postRoutes.delete('/admin/post/{post_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_post_no_middleware(post_id: int, db: AsyncSession = Depends(get_db)):
+    """
+    Eliminar una publicación por ID sin usar middleware.
+    Este endpoint está diseñado para vistas administrativas.
+    """
+    result = await db.execute(select(Post).where(Post.id == post_id))
+    db_post = result.scalar_one_or_none()
+    if db_post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
+
     await db.delete(db_post)
     await db.commit()
     return {"message": "Post deleted"}

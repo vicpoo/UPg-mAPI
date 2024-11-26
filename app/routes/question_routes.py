@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 from app.models.question import Question
-from app.models.user import User
+from app.models.User import User
 from app.schemas.question_schema import QuestionCreate, QuestionResponse
 from app.shared.config.db import get_db
 from sqlalchemy.orm import selectinload  # Para cargar relaciones
@@ -115,6 +115,42 @@ async def update_question(
 @questionRoutes.delete('/question/{question_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_question(question_id: int, db: AsyncSession = Depends(get_db)):
     """Delete a question by ID."""
+    result = await db.execute(select(Question).filter(Question.id == question_id))
+    db_question = result.scalar_one_or_none()
+    if not db_question:
+        raise HTTPException(status_code=404, detail="Question not found")
+
+    await db.delete(db_question)
+    await db.commit()
+    return {"message": "Question deleted"}
+
+
+@questionRoutes.get('/admin/questions/', response_model=List[QuestionResponse])
+async def get_all_questions_no_middleware(db: AsyncSession = Depends(get_db)):
+    """
+    Recuperar todas las preguntas sin usar middleware.
+    Diseñado para vistas administrativas.
+    """
+    result = await db.execute(
+        select(Question)
+        .options(joinedload(Question.usuario))  # Cargar relación con usuario
+    )
+    questions = result.scalars().all()
+
+    # Procesar datos de usuario
+    for question in questions:
+        if question.usuario and question.usuario.foto_perfil:
+            question.usuario.foto_perfil = encode_image(question.usuario.foto_perfil)
+
+    return questions
+
+
+@questionRoutes.delete('/admin/question/{question_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_question_no_middleware(question_id: int, db: AsyncSession = Depends(get_db)):
+    """
+    Eliminar una pregunta por ID sin usar middleware.
+    Diseñado para vistas administrativas.
+    """
     result = await db.execute(select(Question).filter(Question.id == question_id))
     db_question = result.scalar_one_or_none()
     if not db_question:

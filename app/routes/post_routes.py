@@ -5,7 +5,7 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 from sqlalchemy import desc
 from app.models.post import Post
-from app.models.user import User
+from app.models.User import User
 from app.schemas.post_schema import PostResponse
 from app.shared.config.db import get_db
 import base64

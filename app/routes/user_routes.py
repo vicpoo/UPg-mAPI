@@ -9,7 +9,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 import base64
-from app.models.user import User
+from app.models.User import User
 
 userRoutes = APIRouter()
 

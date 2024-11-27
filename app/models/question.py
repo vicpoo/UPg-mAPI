@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, Text, ForeignKey, DateTime
 from sqlalchemy.sql import func
 from app.shared.config.db import Base
-from app.models.user import User # Asegúrate de importar el modelo de usuario
+from app.models.User import User # Asegúrate de importar el modelo de usuario
 from sqlalchemy.orm import relationship
 
 

@@ -10,11 +10,13 @@ from app.routes.comment_routes import commentRoutes
 from app.routes.news_routes import newsRoutes
 from app.routes.question_routes import questionRoutes
 from app.routes.like_routes import likeRoutes
-from app.routes.muscle_group_routes import muscleGroupRoutes
-from app.routes.exercise_routes import exerciseRoutes
 from app.routes.respuesta_routes import respuestaRoutes
 from app.routes.admin_routes import adminRoutes
 from app.routes.PorcentajeGrasa_routes import porcentajeGrasaRoutes
+from app.routes.nivel_ejercicio_routes import  nivelRoutes
+from app.routes.ubicaciones_routes import ubicacionesRoutes
+from app.routes.ejercicio_routes import ejercicioRoutes
+from app.routes.anuncio_routes import anuncioRoutes
 
 
 # Inicializar la aplicación FastAPI
@@ -27,11 +29,13 @@ app.include_router(commentRoutes)
 app.include_router(newsRoutes)
 app.include_router(questionRoutes)
 app.include_router(likeRoutes)
-app.include_router(muscleGroupRoutes)
-app.include_router(exerciseRoutes)
 app.include_router(respuestaRoutes)
 app.include_router(adminRoutes)
 app.include_router(porcentajeGrasaRoutes)
+app.include_router(nivelRoutes)
+app.include_router(ubicacionesRoutes)
+app.include_router(ejercicioRoutes)
+app.include_router(anuncioRoutes)
 
 # Configuración de CORS
 origins = [

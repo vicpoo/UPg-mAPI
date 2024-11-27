@@ -4,7 +4,7 @@ from sqlalchemy.future import select
 from app.models.PorcentajeGrasa import PorcentajeGrasa
 from app.schemas.PorcentajeGrasa_schema import PorcentajeGrasaCreate, PorcentajeGrasaResponse
 from app.shared.config.db import get_db
-from app.models.user import User  # Importa correctamente el modelo User
+from app.models.User import User  # Importa correctamente el modelo User
 from app.routes.user_routes import get_current_user  # Para obtener al usuario logueado
 
 porcentajeGrasaRoutes = APIRouter()

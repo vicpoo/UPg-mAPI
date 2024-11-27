@@ -19,6 +19,9 @@ AsyncSessionLocal = sessionmaker(
     autoflush=False
 )
 
+# Exponer async_session como un alias para evitar confusión
+async_session = AsyncSessionLocal
+
 # Declarar la base para los modelos
 Base = declarative_base()
 

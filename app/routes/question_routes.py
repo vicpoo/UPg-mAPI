@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 from app.models.question import Question
-from app.models.user import User
+from app.models.User import User
 from app.schemas.question_schema import QuestionCreate, QuestionResponse
 from app.shared.config.db import get_db
 from sqlalchemy.orm import selectinload  # Para cargar relaciones

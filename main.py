@@ -41,7 +41,9 @@ app.include_router(anuncioRoutes)
 origins = [
     "http://localhost",
     "http://localhost:4200",
-    "http://127.0.0.1:8000"
+    "http://127.0.0.1:8000",
+    "http://98.84.148.143",
+    "http://3.215.146.244:8000"
 ]
 
 app.add_middleware(
